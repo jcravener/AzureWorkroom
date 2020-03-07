@@ -1,0 +1,149 @@
+{
+  "$schema": "http://schema.express.azure.com/schemas/2015-01-01-alpha/ServiceModel.json",
+  "contentVersion": "0.0.0.1",
+
+  "ServiceMetadata": {
+    "ServiceGroup": "SkypeTeams",
+    "Environment": "INT"
+  },
+
+  "ServiceResourceGroupDefinitions":
+  [
+    {
+      "Name": "MSTeams.Service",
+      "ServiceResourceDefinitions":
+      [
+        {
+          "Name": "MSTeams.Service.Webhook.test",
+          "composedOf":
+          {
+            "arm":
+            {
+              "templatePath": "templates\\resourceprovisioning_azuredeploy_region.json"
+            }
+          }
+        },
+		{
+          "Name": "MSTeams.Service.Webhook.test2",
+          "composedOf": {
+            "arm": {
+              "templatePath": "templates\\resourceprovisioning_azuredeploy_baseregion.json"
+            }
+          } 
+        },
+		{
+          "Name": "MSTeams.Service.Webhook.test3",
+          "composedOf": {
+            "arm": {
+              "templatePath": "templates\\resourceprovisioning_azuredeploy_atm.json"
+            }
+          } 
+        }
+      ]
+    },
+    {
+      "Name": "MSTeams.Service2",
+      "ServiceResourceDefinitions":
+      [
+        {
+          "Name": "MSTeams.Service.Shellext.test",
+          "composedOf":
+          {
+            "extension":
+            {
+              "shell":
+              [
+                {
+                  "type": "testscript",
+                  "properties":
+                  {
+                    "imageName": "adm-windowsservercore-w",
+                    "imageVersion": "v3"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+
+  "ServiceResourceGroups":
+  [
+    {{#countries}}
+    {
+      "AzureResourceGroupName": "mst-webhook-prod-trs-{{baseregion}}",
+      "Location": "{{location1}}",
+      "InstanceOf": "MSTeams.Service",
+      "AzureSubscriptionId": "{{subscriptionId}}",
+      "ServiceResources":
+      [
+        {
+          "Name": "ArmTemplate1-{{abbrev}}",
+          "InstanceOf": "MSTeams.Service.Webhook.test2",
+          "ArmParametersPath": "parameters\\resourceprovisioining_azuredeploy_{{abbrev}}_parameters.json"
+        }
+      ]
+    },
+	{
+      "AzureResourceGroupName": "mst-webhook-prod-trs-{{region1}}",
+      "Location": "{{location1}}",
+      "InstanceOf": "MSTeams.Service",
+      "AzureSubscriptionId": "{{subscriptionId}}",
+      "ServiceResources":
+      [
+        {
+          "Name": "ArmTemplate2-{{abbrev}}",
+          "InstanceOf": "MSTeams.Service.Webhook.test",
+          "ArmParametersPath": "parameters\\resourceprovisioining_azuredeploy_{{abbrev}}_parameters.json"
+        }
+      ]
+    },
+	{{^isSingleRegion}}
+    {
+      "AzureResourceGroupName": "mst-webhook-prod-trs-{{region2}}",
+      "Location": "{{location2}}",
+      "InstanceOf": "MSTeams.Service",
+      "AzureSubscriptionId": "{{subscriptionId}}",
+      "ServiceResources":
+      [
+        {
+          "Name": "ArmTemplate3-{{abbrev}}",
+          "InstanceOf": "MSTeams.Service.Webhook.test",
+          "ArmParametersPath": "parameters\\resourceprovisioining_azuredeploy_{{abbrev}}_parameters.json"
+        }
+      ]
+    },
+	{{/isSingleRegion}}
+	{
+      "AzureResourceGroupName": "teams-webhook-atm-prod-trs-{{abbrev}}",
+      "Location": "westus",
+      "InstanceOf": "MSTeams.Service",
+      "AzureSubscriptionId": "{{subscriptionId}}",
+      "ServiceResources":
+      [
+        {
+          "Name": "AtmProfile-{{abbrev}}",
+          "InstanceOf": "MSTeams.Service.Webhook.test3",
+          "ArmParametersPath": "parameters\\resourceprovisioining_azuredeploy_{{abbrev}}_parameters.json"
+        }
+      ]
+    },
+    {
+      "AzureResourceGroupName": "mst-webhook-shell-{{abbrev}}",
+      "Location": "Southeast Asia",
+      "InstanceOf": "MSTeams.Service2",
+      "AzureSubscriptionId": "{{subscriptionId}}",
+      "ServiceResources":
+      [
+        {
+          "Name": "CrossRegionScript-{{abbrev}}",
+          "InstanceOf": "MSTeams.Service.Shellext.test",
+          "rolloutParametersPath": "parameters\\resourceprovisioining_shellext_{{abbrev}}_parameters.json"
+        }
+      ]
+    }{{^last}},{{/last}}
+    {{/countries}}
+  ]
+}
