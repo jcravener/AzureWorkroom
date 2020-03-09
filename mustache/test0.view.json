@@ -11,6 +11,11 @@
                     {
                         "Name":  "mike",
                         "Company":  "teal plumbing and mecahnical"
+                    },
+                    {
+                        "Name":  "bob",
+                        "Company":  "coffee shop"
                     }
-                ]
+                ],
+    "Local":  "USA"
 }

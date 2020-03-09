@@ -1,6 +1,7 @@
 {{#Catalog}}
 {
     "FirstName":  "{{Name}}",
-    "CompanyName":  "{{Company}}"
+    "CompanyName":  "{{Company}}",
+    "Location":  "{{Local}}"
 }
 {{/Catalog}}
