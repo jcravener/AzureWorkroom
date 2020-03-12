@@ -34,34 +34,32 @@ $parampath = $projdir + "\parameters.view.json"
 # Creates object list of countries available in parameters.view file . 
 # Each country oject contains properties regions,subscription id , locations
 $viewObj = Get-Content -Path $parampath | ConvertFrom-Json
-$viewObj
-exit
 
 foreach ($country in $viewObj.countries)
 {
 	$abbrev = $country.abbrev
 	$abbrev
-	$countryviewpath = $projdir + $country.name + "_view.json"
+	$countryviewpath = $projdir + "\" + $country.name + "_view.json"
 	$country.last = ""
 
 	$country
+
 	# Create a temporary file to store the country property object for each country
 	$country | ConvertTo-Json | Out-File $countryviewpath
 
 	# Set the output Paths for Parameters files
-	$armparampath = $sgrdir + "\parameters\resourceprovisioining_azuredeploy_" + $abbrev + "_parameters.json"
+	$armparampath = $sgrdir + "\parameters\azuredeploy_" + $abbrev + "_parameters.json"
 
-
-	pushd $mustpath
+	#pushd $mustpath
 	# run mustache to generate Parameters files
-	$deploymustpath = $projdir + "azuredeploy.parameters.mustache.json"
-	node $mustnode $countryviewpath $deploymustpath > $armparampath
+	$deploymustpath = $projdir + "parameters.mustache.json"
+	"node $mustnode $countryviewpath $deploymustpath > $armparampath"
 
-	popd
+	#popd
 	# delete the country property work file
 	Remove-Item $countryviewpath
 }
-
+exit
 # copy buildver.txt a second time
 robocopy .\ $sgrdir buildver.txt
 
