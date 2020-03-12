@@ -3,25 +3,25 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "Redis_tst__name": {
-            "value": null
+            "value": "{{region1}}-ens-arm-tst-rds"
         },
         "vaults_tst_name": {
-            "value": null
+            "value": "{{region1}}-ens-arm-tst-vlt"
         },
-        "storageAccounts_tst_name": {
-            "value": null
-        },
+      "storageAccounts_tst_name": {
+        "value": "{{region1}}ensarmtst"
+      },
         "namespaces_tst_name": {
-            "value": null
+            "value": "{{region1}}-ens-arm-tst-eh"
         },
         "databaseAccounts_tst_name": {
-            "value": null
+            "value": "{{region1}}-ens-arm-tst-ddb"
         },
         "trafficManagerProfiles_tst_rt_name": {
-            "value": null
+            "value": "{{region1}}-ens-arm-atm-rt"
         },
-        "trafficManagerProfiles_tst_nst_name": {
-            "value": null
-        }
+      "trafficManagerProfiles_tst_nst_name": {
+        "value": "{{region1}}-ens-arm-tst-atm-nst"
+      }
     }
 }
