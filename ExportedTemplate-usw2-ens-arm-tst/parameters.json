@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Redis_usw2_ens_arm_tst_rds_name": {
+            "value": null
+        },
+        "vaults_usw2_ens_arm_tst_vlt_name": {
+            "value": null
+        },
+        "storageAccounts_usw2ensarmtst_name": {
+            "value": null
+        },
+        "namespaces_usw2_ens_arm_tst_eh_name": {
+            "value": null
+        },
+        "databaseAccounts_usw2_ens_arm_tst_ddb_name": {
+            "value": null
+        },
+        "trafficManagerProfiles_usw2_ens_arm_atm_rt_name": {
+            "value": null
+        },
+        "trafficManagerProfiles_usw2_ens_arm_tst_atm_nst_name": {
+            "value": null
+        }
+    }
+}
