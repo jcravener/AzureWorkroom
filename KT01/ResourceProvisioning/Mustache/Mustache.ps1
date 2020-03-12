@@ -9,13 +9,10 @@ param (
 $PSDefaultParameterValues['Out-File:Encoding'] = 'ASCII'
 
 # $sgrdir is ServiceGroupRoot directory where all files will be generated like ServiceModel,RolloutSPec, RolloutParameter Files
-$sgrdir = $projdir + "..\..\ServiceGroupRoot"
+$sgrdir = $projdir + "\..\..\ServiceGroupRoot"
 
 $paramdir = $sgrdir + "\parameters"
 $templatedir = $sgrdir + "\templates"
-
-exit
-
 
 # create the output directories
 if (!(Test-Path -Path $sgrdir)) {md $sgrdir}
@@ -26,22 +23,20 @@ if (!(Test-Path -Path $templatedir)) {md $templatedir}
 robocopy .\templates $templatedir *.json
 robocopy .\ $sgrdir buildver.txt
 
-# run mustache to generate the service model
-$servpath = $sgrdir + "\ServiceModel.json"
-Write-Host $servpath
-$mustpath = $env:USERPROFILE + "\AppData\Roaming\npm"
+# setup mustache node path
+$mustpath = $projdir + '\..\..\..\mustache'
 $mustnode = $mustpath +"\node_modules\mustache\bin\mustache"
-$parampath = $projdir + "parameters.view.json"
-$servmodelpath = $projdir + "ServiceModel.mustache.json"
 
-pushd $mustpath
-dir
-popd
+# setup parameters view path
+$parampath = $projdir + "\parameters.view.json"
 
 # Please follow through Readme.MD  to refernce all properties available for each country and for steps need to be followed.
 # Creates object list of countries available in parameters.view file . 
 # Each country oject contains properties regions,subscription id , locations
-$viewObj = Get-Content .\parameters.view.json | ConvertFrom-Json
+$viewObj = Get-Content -Path $parampath | ConvertFrom-Json
+$viewObj
+exit
+
 foreach ($country in $viewObj.countries)
 {
 	$abbrev = $country.abbrev
