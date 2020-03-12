@@ -9,22 +9,21 @@ param (
 $PSDefaultParameterValues['Out-File:Encoding'] = 'ASCII'
 
 # $sgrdir is ServiceGroupRoot directory where all files will be generated like ServiceModel,RolloutSPec, RolloutParameter Files
-$sgrdir = $projdir + "..\..\expressv2\ResourceProvisioning\ServiceGroupRoot"
-
+$sgrdir = $projdir + "..\..\ServiceGroupRoot"
 
 $paramdir = $sgrdir + "\parameters"
 $templatedir = $sgrdir + "\templates"
-$scriptdir = $sgrdir + "\scripts"
+
+exit
+
 
 # create the output directories
 if (!(Test-Path -Path $sgrdir)) {md $sgrdir}
 if (!(Test-Path -Path $paramdir)) {md $paramdir}
 if (!(Test-Path -Path $templatedir)) {md $templatedir}
-if (!(Test-Path -Path $scriptdir)) {md $scriptdir}
 
 # copy the templates & scripts
 robocopy .\templates $templatedir *.json
-robocopy .\Scripts $scriptdir *.zip
 robocopy .\ $sgrdir buildver.txt
 
 # run mustache to generate the service model
@@ -36,9 +35,7 @@ $parampath = $projdir + "parameters.view.json"
 $servmodelpath = $projdir + "ServiceModel.mustache.json"
 
 pushd $mustpath
-# run mustache to generate the service model
 dir
-node $mustnode $parampath $servmodelpath  > $servpath
 popd
 
 # Please follow through Readme.MD  to refernce all properties available for each country and for steps need to be followed.
@@ -52,33 +49,19 @@ foreach ($country in $viewObj.countries)
 	$countryviewpath = $projdir + $country.name + "_view.json"
 	$country.last = ""
 
-	#Add global properties(shared secrets key vaults link , Service Principal object id, Pools list ) into the country property object
-	Add-Member -InputObject $country -MemberType NoteProperty -Name myObjId -Value $viewObj.myObjId
-	Add-Member -InputObject $country -MemberType NoteProperty -Name scriptSpnAppId -Value $viewObj.scriptSpnAppId
-	Add-Member -InputObject $country -MemberType NoteProperty -Name scriptSpnObjId -Value $viewObj.scriptSpnObjId
-	Add-Member -InputObject $country -MemberType NoteProperty -Name spnSecretLink -Value $viewObj.spnSecretLink
-	Add-Member -InputObject $country -MemberType NoteProperty -Name tenantId -Value $viewObj.tenantId
-	Add-Member -InputObject $country -MemberType NoteProperty -Name existKeyVaultLink -Value $viewObj.existKeyVaultLink
-	Add-Member -InputObject $country -MemberType NoteProperty -Name poolSuffix1 -Value $viewObj.poolSuffix1
-	Add-Member -InputObject $country -MemberType NoteProperty -Name poolSuffix2 -Value $viewObj.poolSuffix2
 	$country
 	# Create a temporary file to store the country property object for each country
 	$country | ConvertTo-Json | Out-File $countryviewpath
 
-	# Set the output Paths for Rollout parameters, RolloutSpec files, Shell Extension parameter files
+	# Set the output Paths for Parameters files
 	$armparampath = $sgrdir + "\parameters\resourceprovisioining_azuredeploy_" + $abbrev + "_parameters.json"
-	$rollparampath = $sgrdir + "\parameters\resourceprovisioining_shellext_" + $abbrev + "_parameters.json"
-	$rollspecpath = $sgrdir + "\RolloutSpec-ResProv-" + $abbrev + ".json"
 
 
 	pushd $mustpath
-	# run mustache to generate Parameter files, RolloutSpec Files, Shell extension parameter files
+	# run mustache to generate Parameters files
 	$deploymustpath = $projdir + "azuredeploy.parameters.mustache.json"
 	node $mustnode $countryviewpath $deploymustpath > $armparampath
-	$shellmustpath = $projdir + "rolloutparameters.shellext.mustache.json"
-	node $mustnode $countryviewpath $shellmustpath > $rollparampath
-	$rolloutmustpath = $projdir + "rolloutspec.mustache.json"
-	node $mustnode $countryviewpath $rolloutmustpath > $rollspecpath
+
 	popd
 	# delete the country property work file
 	Remove-Item $countryviewpath
