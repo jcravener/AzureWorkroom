@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Redis_tst__name": {
+            "value": null
+        },
+        "vaults_tst_name": {
+            "value": null
+        },
+        "storageAccounts_tst_name": {
+            "value": null
+        },
+        "namespaces_tst_name": {
+            "value": null
+        },
+        "databaseAccounts_tst_name": {
+            "value": null
+        },
+        "trafficManagerProfiles_tst_rt_name": {
+            "value": null
+        },
+        "trafficManagerProfiles_tst_nst_name": {
+            "value": null
+        }
+    }
+}

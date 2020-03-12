@@ -2,42 +2,44 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "Redis_usw2_ens_arm_tst_rds_name": {
+        "Redis_tst__name": {
             "defaultValue": "usw2-ens-arm-tst-rds",
             "type": "String"
         },
-        "vaults_usw2_ens_arm_tst_vlt_name": {
+        "vaults_tst_name": {
             "defaultValue": "usw2-ens-arm-tst-vlt",
             "type": "String"
         },
-        "storageAccounts_usw2ensarmtst_name": {
+        "storageAccounts_tst_name": {
             "defaultValue": "usw2ensarmtst",
             "type": "String"
         },
-        "namespaces_usw2_ens_arm_tst_eh_name": {
+        "namespaces_tst_name": {
             "defaultValue": "usw2-ens-arm-tst-eh",
             "type": "String"
         },
-        "databaseAccounts_usw2_ens_arm_tst_ddb_name": {
+        "databaseAccounts_tst_name": {
             "defaultValue": "usw2-ens-arm-tst-ddb",
             "type": "String"
         },
-        "trafficManagerProfiles_usw2_ens_arm_atm_rt_name": {
+        "trafficManagerProfiles_tst_rt_name": {
             "defaultValue": "usw2-ens-arm-atm-rt",
             "type": "String"
         },
-        "trafficManagerProfiles_usw2_ens_arm_tst_atm_nst_name": {
+        "trafficManagerProfiles_tst_nst_name": {
             "defaultValue": "usw2-ens-arm-tst-atm-nst",
             "type": "String"
         }
     },
-    "variables": {},
+  "variables": {
+    "location": "[resourceGroup().location]"
+  },
     "resources": [
         {
             "type": "Microsoft.Cache/Redis",
             "apiVersion": "2019-07-01",
-            "name": "[parameters('Redis_usw2_ens_arm_tst_rds_name')]",
-            "location": "West US 2",
+            "name": "[parameters('Redis_tst__name')]",
+            "location": "[variables('location')]",
             "properties": {
                 "sku": {
                     "name": "Standard",
@@ -56,8 +58,8 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "apiVersion": "2020-03-01",
-            "name": "[parameters('databaseAccounts_usw2_ens_arm_tst_ddb_name')]",
-            "location": "West US 2",
+            "name": "[parameters('databaseAccounts_tst_name')]",
+            "location": "[variables('location')]",
             "tags": {
                 "defaultExperience": "Core (SQL)",
                 "hidden-cosmos-mmspecial": "",
@@ -79,7 +81,7 @@
                 },
                 "locations": [
                     {
-                        "locationName": "West US 2",
+                        "locationName": "[variables('location')]",
                         "provisioningState": "Succeeded",
                         "failoverPriority": 0,
                         "isZoneRedundant": false
@@ -91,8 +93,8 @@
         {
             "type": "Microsoft.EventHub/namespaces",
             "apiVersion": "2018-01-01-preview",
-            "name": "[parameters('namespaces_usw2_ens_arm_tst_eh_name')]",
-            "location": "West US 2",
+            "name": "[parameters('namespaces_tst_name')]",
+            "location": "[variables('location')]",
             "sku": {
                 "name": "Standard",
                 "tier": "Standard",
@@ -108,8 +110,8 @@
         {
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "2016-10-01",
-            "name": "[parameters('vaults_usw2_ens_arm_tst_vlt_name')]",
-            "location": "westus2",
+            "name": "[parameters('vaults_tst_name')]",
+            "location": "[variables('location')]",
             "properties": {
                 "sku": {
                     "family": "A",
@@ -170,13 +172,13 @@
         {
             "type": "Microsoft.Network/trafficManagerProfiles",
             "apiVersion": "2018-04-01",
-            "name": "[parameters('trafficManagerProfiles_usw2_ens_arm_tst_atm_nst_name')]",
+            "name": "[parameters('trafficManagerProfiles_tst_nst_name')]",
             "location": "global",
             "properties": {
                 "profileStatus": "Enabled",
                 "trafficRoutingMethod": "Performance",
                 "dnsConfig": {
-                    "relativeName": "[parameters('trafficManagerProfiles_usw2_ens_arm_tst_atm_nst_name')]",
+                    "relativeName": "[parameters('trafficManagerProfiles_tst_nst_name')]",
                     "ttl": 60
                 },
                 "monitorConfig": {
@@ -195,8 +197,8 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[parameters('storageAccounts_usw2ensarmtst_name')]",
-            "location": "westus2",
+            "name": "[parameters('storageAccounts_tst_name')]",
+            "location": "[variables('location')]",
             "sku": {
                 "name": "Standard_RAGRS",
                 "tier": "Standard"
@@ -229,10 +231,10 @@
         {
             "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
             "apiVersion": "2017-04-01",
-            "name": "[concat(parameters('namespaces_usw2_ens_arm_tst_eh_name'), '/RootManageSharedAccessKey')]",
-            "location": "West US 2",
+            "name": "[concat(parameters('namespaces_tst_name'), '/RootManageSharedAccessKey')]",
+            "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_usw2_ens_arm_tst_eh_name'))]"
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_tst_name'))]"
             ],
             "properties": {
                 "rights": [
@@ -245,10 +247,10 @@
         {
             "type": "Microsoft.EventHub/namespaces/networkRuleSets",
             "apiVersion": "2018-01-01-preview",
-            "name": "[concat(parameters('namespaces_usw2_ens_arm_tst_eh_name'), '/default')]",
-            "location": "West US 2",
+            "name": "[concat(parameters('namespaces_tst_name'), '/default')]",
+            "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_usw2_ens_arm_tst_eh_name'))]"
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_tst_name'))]"
             ],
             "properties": {
                 "defaultAction": "Deny",
@@ -259,16 +261,16 @@
         {
             "type": "Microsoft.Network/trafficManagerProfiles",
             "apiVersion": "2018-04-01",
-            "name": "[parameters('trafficManagerProfiles_usw2_ens_arm_atm_rt_name')]",
+            "name": "[parameters('trafficManagerProfiles_tst_rt_name')]",
             "location": "global",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_usw2_ens_arm_tst_atm_nst_name'))]"
+                "[resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_tst_nst_name'))]"
             ],
             "properties": {
                 "profileStatus": "Enabled",
                 "trafficRoutingMethod": "Performance",
                 "dnsConfig": {
-                    "relativeName": "[parameters('trafficManagerProfiles_usw2_ens_arm_atm_rt_name')]",
+                    "relativeName": "[parameters('trafficManagerProfiles_tst_rt_name')]",
                     "ttl": 60
                 },
                 "monitorConfig": {
@@ -281,13 +283,13 @@
                 },
                 "endpoints": [
                     {
-                        "id": "[concat(resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_usw2_ens_arm_atm_rt_name')), '/nestedEndpoints/usw2-ep-01')]",
+                        "id": "[concat(resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_tst_rt_name')), '/nestedEndpoints/usw2-ep-01')]",
                         "name": "usw2-ep-01",
                         "type": "Microsoft.Network/trafficManagerProfiles/nestedEndpoints",
                         "properties": {
                             "endpointStatus": "Enabled",
                             "endpointMonitorStatus": "Stopped",
-                            "targetResourceId": "[resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_usw2_ens_arm_tst_atm_nst_name'))]",
+                            "targetResourceId": "[resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_tst_nst_name'))]",
                             "target": "usw2-ens-arm-tst-atm-nst.trafficmanager.net",
                             "weight": 1,
                             "priority": 1,
@@ -303,9 +305,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_usw2ensarmtst_name'), '/default')]",
+            "name": "[concat(parameters('storageAccounts_tst_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_usw2ensarmtst_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name'))]"
             ],
             "sku": {
                 "name": "Standard_RAGRS"
@@ -322,9 +324,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageAccounts_usw2ensarmtst_name'), '/default')]",
+            "name": "[concat(parameters('storageAccounts_tst_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_usw2ensarmtst_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name'))]"
             ],
             "sku": {
                 "name": "Standard_RAGRS"

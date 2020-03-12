@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\ExportedTemplate-usw2-ens-arm-tst",
+    "\\templates"
   ],
+  "SelectedNode": "\\templates\\template.json",
   "PreviewInSolutionExplorer": false
 }
