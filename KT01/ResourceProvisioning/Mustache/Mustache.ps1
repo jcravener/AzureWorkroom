@@ -42,7 +42,7 @@ foreach ($country in $viewObj.countries)
 	$countryviewpath = $projdir + "\" + $country.name + "_view.json"
 	$country.last = ""
 
-	$country
+	#$country
 
 	# Create a temporary file to store the country property object for each country
 	$country | ConvertTo-Json | Out-File $countryviewpath
@@ -52,14 +52,13 @@ foreach ($country in $viewObj.countries)
 
 	#pushd $mustpath
 	# run mustache to generate Parameters files
-	$deploymustpath = $projdir + "parameters.mustache.json"
-	"node $mustnode $countryviewpath $deploymustpath > $armparampath"
+	$deploymustpath = $projdir + "\parameters.mustache.json"
+	node $mustnode $countryviewpath $deploymustpath > $armparampath
 
 	#popd
 	# delete the country property work file
-	Remove-Item $countryviewpath
+	#Remove-Item $countryviewpath
 }
-exit
 # copy buildver.txt a second time
-robocopy .\ $sgrdir buildver.txt
+#robocopy .\ $sgrdir buildver.txt
 

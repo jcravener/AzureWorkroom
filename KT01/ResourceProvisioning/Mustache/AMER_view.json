@@ -1,0 +1,17 @@
+{
+    "abbrev":  "US2",
+    "name":  "AMER",
+    "subscriptionId":  "d115e1bc-7b9e-4a78-aca8-97ff3a2dbd10",
+    "siteSpnObjId":  "5b5e4c9c-57df-4dbc-a342-36ef6630ef59",
+    "last":  "",
+    "baseregion":  "us2",
+    "cosmosaccountname":  "usw2",
+    "isSingleRegion":  false,
+    "region1":  "usw2",
+    "location1":  "West US 2",
+    "region2":  "use2",
+    "location2":  "East US 2",
+    "notificationstorage":  "uswe",
+    "priorityNotificationsgroup":  "uswe",
+    "priorityNotificationsdb":  "us"
+}

@@ -1,0 +1,19 @@
+{
+    "abbrev":  "SG",
+    "name":  "Singapore",
+    "subscriptionId":  "9f29b1e7-15ae-49fe-822c-002cf5e83a04",
+    "siteSpnObjId":  "5b5e4c9c-57df-4dbc-a342-36ef6630ef59",
+    "comment5":  "last is true for the last country section in the array, false for all the others. ",
+    "last":  "",
+    "baseregion":  "sg",
+    "cosmosaccountname":  "sgse",
+    "comment3":  " If isSingleRegion value is false, golocal has two regions and storage accounts will be RA-GRS, if value is true golocal has one region and storage accounts,cosmos are ZRS(Zone Redundant)",
+    "isSingleRegion":  true,
+    "region1":  "sgse",
+    "location1":  "Southeast Asia",
+    "region2":  "",
+    "location2":  "",
+    "notificationstorage":  "asse",
+    "priorityNotificationsgroup":  "asea",
+    "priorityNotificationsdb":  "apac"
+}
