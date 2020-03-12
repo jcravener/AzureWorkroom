@@ -38,17 +38,19 @@ $viewObj = Get-Content -Path $parampath | ConvertFrom-Json
 foreach ($country in $viewObj.countries)
 {
 	$abbrev = $country.abbrev
-	$abbrev
+	#$abbrev
 	$countryviewpath = $projdir + "\" + $country.name + "_view.json"
 	$country.last = ""
 
-	#$country
+	$countryviewpath
+	$country
 
 	# Create a temporary file to store the country property object for each country
 	$country | ConvertTo-Json | Out-File $countryviewpath
 
 	# Set the output Paths for Parameters files
 	$armparampath = $sgrdir + "\parameters\azuredeploy_" + $abbrev + "_parameters.json"
+	$armparampath
 
 	#pushd $mustpath
 	# run mustache to generate Parameters files
@@ -57,7 +59,7 @@ foreach ($country in $viewObj.countries)
 
 	#popd
 	# delete the country property work file
-	#Remove-Item $countryviewpath
+	Remove-Item $countryviewpath
 }
 # copy buildver.txt a second time
 #robocopy .\ $sgrdir buildver.txt
