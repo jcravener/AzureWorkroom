@@ -30,5 +30,5 @@ foreach ($country in $depObj.countries)
 	$tpf = $country.RootPath + $country.ParamPath + $country.ParamFile
 	$tf = $country.RootPath + $country.TemplatePath + $country.TemplateFile
 	
-	New-Object -TypeName psobject -Property @{'Country' = $n; 'Commandline' = "New-AzureRmResourceGroupDeployment -Name $n -ResourceGroupName $rgn -TemplateParameterFile $tpf -TemplateFile $tf -AsJob"}
+	New-Object -TypeName psobject -Property @{'Country' = $n; 'Commandline' = "New-AzureRmResourceGroupDeployment -Name $n -ResourceGroupName $rgn -TemplateParameterFile $tpf -TemplateFile $tf -AsJob -DeploymentDebugLogLevel All"}
 }
