@@ -1,0 +1,11 @@
+{{#countries}}
+{
+  "abbrev": "{{abbrev}}",
+  "RootPath": "D:\\Source\\AzureWorkroom\\KT01",
+  "ParamPath": "\\ServiceGroupRoot\\parameters",
+  "ParamFile": "\\azuredeploy_{{abbrev}}_parameters.json",
+  "TemplatePath": "\\ServiceGroupRoot\\templates",
+  "TemplateFile": "\\template.json",
+  "ResourceGroupName": "rg-{{abbrev}}-{{region1}}-arm-tst"
+},
+{{/countries}}

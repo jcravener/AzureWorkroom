@@ -27,7 +27,19 @@ $viewObj = Get-Content -Path $parampath | ConvertFrom-Json
 
 foreach ($country in $viewObj.countries)
 {
-	$rgname = $country.region1 + "-arm-tst"
-	New-AzureRmResourceGroup -Name $rgname -Location $country.location1
+	$rgname = "rg-" + $country.abbrev + "-" + $country.region1 + "-arm-tst"
+	Get-AzureRmResourceGroup -ResourceGroupName $rgname -ErrorAction SilentlyContinue | Out-Null
+
+	if(-not $?)
+	{
+		New-AzureRmResourceGroup -Name $rgname -Location $country.location1	
+	}
+	else
+	{
+		Write-Host -Object "Resource Group $rgname already exists."
+	}
 }
 
+Get-AzureRmResourceGroup |
+	? ResourceGroupName -Match '^rg.*\-arm\-tst' |
+		Select-Object -Property ResourceGroupName, Location
