@@ -442,6 +442,19 @@
         "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name'))]"
       ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('vaults_tst_name'), '/', parameters('databaseAccounts_tst_name'), 'ConStr')]",
+      "apiVersion": "2016-10-01",
+      "properties": {
+        "contentType": "text/plain",
+        "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccounts_tst_name')), '2015-04-08').primaryMasterKey]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_tst_name'))]"
+      ]
     }
   ]
 }
