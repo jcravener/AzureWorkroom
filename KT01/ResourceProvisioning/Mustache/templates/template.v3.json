@@ -449,7 +449,9 @@
       "apiVersion": "2016-10-01",
       "properties": {
         "contentType": "text/plain",
-        "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccounts_tst_name')), '2015-04-08').primaryMasterKey]"
+        // connection string: AccountEndpoint=https://sgse-ens-arm-tst-ddb.documents.azure.com:443/;AccountKey=xxx;
+        "value": "[ concat('AccountEndpoint=https://', parameters('databaseAccounts_tst_name'), '.documents.azure.com:443/;AccountKey=', listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccounts_tst_name')), '2015-04-08').primaryMasterKey, ';')]"
+        //"value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccounts_tst_name')), '2015-04-08').primaryMasterKey]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
