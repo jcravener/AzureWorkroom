@@ -436,7 +436,7 @@
       "apiVersion": "2016-10-01",
       "properties": {
         "contentType": "text/plain",
-        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_tst_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name')), '2016-10-01').keys[0].value, ';')]"
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_tst_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name')), '2017-10-01').keys[0].value, ';')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
