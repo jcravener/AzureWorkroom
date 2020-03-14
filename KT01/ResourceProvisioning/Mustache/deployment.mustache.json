@@ -5,7 +5,7 @@
   "ParamPath": "\\ServiceGroupRoot\\parameters",
   "ParamFile": "\\azuredeploy_{{abbrev}}_parameters.json",
   "TemplatePath": "\\ServiceGroupRoot\\templates",
-  "TemplateFile": "\\template.v2.json",
+  "TemplateFile": "\\template.v3.json",
   "ResourceGroupName": "rg-{{abbrev}}-{{region1}}-arm-tst"
 },
 {{/countries}}
