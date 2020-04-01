@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Redis_tst__name": {
+      "value": "chno-ens-arm-tst-rds"
+    },
+    "vaults_tst_name": {
+      "value": "chno-ens-arm-tst-vlt"
+    },
+    "storageAccounts_tst_name": {
+      "value": "chnoensarmtst"
+    },
+    "namespaces_tst_name": {
+      "value": "chno-ens-arm-tst-eh"
+    },
+    "databaseAccounts_tst_name": {
+      "value": "chno-ens-arm-tst-ddb"
+    },
+    "trafficManagerProfiles_tst_rt_name": {
+      "value": "chno-ens-arm-atm-rt"
+    },
+    "trafficManagerProfiles_tst_nst_name": {
+      "value": "chno-ens-arm-tst-atm-nst"
+    }
+  }
+}

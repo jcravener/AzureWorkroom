@@ -1,0 +1,486 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Redis_tst__name": {
+      "defaultValue": "usw2-ens-arm-tst-rds",
+      "type": "String"
+    },
+    "vaults_tst_name": {
+      "defaultValue": "usw2-ens-arm-tst-vlt",
+      "type": "String"
+    },
+    "storageAccounts_tst_name": {
+      "defaultValue": "usw2ensarmtst",
+      "type": "String"
+    },
+    "namespaces_tst_name": {
+      "defaultValue": "usw2-ens-arm-tst-eh",
+      "type": "String"
+    },
+    "databaseAccounts_tst_name": {
+      "defaultValue": "usw2-ens-arm-tst-ddb",
+      "type": "String"
+    },
+    "trafficManagerProfiles_tst_rt_name": {
+      "defaultValue": "usw2-ens-arm-atm-rt",
+      "type": "String"
+    },
+    "trafficManagerProfiles_tst_nst_name": {
+      "defaultValue": "usw2-ens-arm-tst-atm-nst",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "databaseName": "DB01",
+    "containerName": "CT01"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Cache/Redis",
+      "apiVersion": "2019-07-01",
+      "name": "[parameters('Redis_tst__name')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "sku": {
+          "name": "Standard",
+          "family": "C",
+          "capacity": 1
+        },
+        "enableNonSslPort": false,
+        "redisConfiguration": {
+          "maxclients": "1000",
+          "maxmemory-reserved": "50",
+          "maxfragmentationmemory-reserved": "50",
+          "maxmemory-delta": "50"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "name": "[parameters('databaseAccounts_tst_name')]",
+      "apiVersion": "2019-08-01",
+      "location": "[variables('location')]",
+      "kind": "GlobalDocumentDB",
+      "properties": {
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session",
+          "maxIntervalInSeconds": 5,
+          "maxStalenessPrefix": 100
+        },
+        "locations": [
+          {
+            "locationName": "[variables('location')]",
+            "provisioningState": "Succeeded",
+            "failoverPriority": 0,
+            "isZoneRedundant": false
+          }
+        ],
+        "databaseAccountOfferType": "Standard",
+        "enableAutomaticFailover": false,
+        "enableMultipleWriteLocations": false
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "name": "[concat(parameters('databaseAccounts_tst_name'), '/', variables('databaseName'))]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_tst_name'))]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[variables('databaseName')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "name": "[concat(parameters('databaseAccounts_tst_name'), '/', variables('databaseName'), '/', variables('containerName'))]",
+      "apiVersion": "2019-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_tst_name'), variables('databaseName'))]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[variables('containerName')]",
+          "partitionKey": {
+            "paths": [
+              "/myPartitionKey"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/myPathToNotIndex/*"
+              }
+            ]
+          }
+        },
+        "options": {
+          "throughput": 400
+        }
+      },
+      "resources": [
+        {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/storedProcedures",
+          "name": "[concat(parameters('databaseAccounts_tst_name'), '/', variables('databaseName'), '/', variables('containerName'), '/myStoredProcedure')]",
+          "apiVersion": "2019-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('databaseAccounts_tst_name'), variables('databaseName'), variables('containerName'))]"
+          ],
+          "properties": {
+            "resource": {
+              "id": "myStoredProcedure",
+              "body": "function () { var context = getContext(); var response = context.getResponse(); response.setBody('Hello, World'); }"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/triggers",
+          "name": "[concat(parameters('databaseAccounts_tst_name'), '/', variables('databaseName'), '/', variables('containerName'), '/myPreTrigger')]",
+          "apiVersion": "2019-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('databaseAccounts_tst_name'), variables('databaseName'), variables('containerName'))]"
+          ],
+          "properties": {
+            "resource": {
+              "id": "myPreTrigger",
+              "triggerType": "Pre",
+              "triggerOperation": "Create",
+              "body": "function validateToDoItemTimestamp(){var context=getContext();var request=context.getRequest();var itemToCreate=request.getBody();if(!('timestamp'in itemToCreate)){var ts=new Date();itemToCreate['timestamp']=ts.getTime();}request.setBody(itemToCreate);}"
+            }
+          }
+        },
+        {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+          "name": "[concat(parameters('databaseAccounts_tst_name'), '/', variables('databaseName'), '/', variables('containerName'), '/myUserDefinedFunction')]",
+          "apiVersion": "2019-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('databaseAccounts_tst_name'), variables('databaseName'), variables('containerName'))]"
+          ],
+          "properties": {
+            "resource": {
+              "id": "myUserDefinedFunction",
+              "body": "function tax(income){if(income==undefined)throw'no input';if(income<1000)return income*0.1;else if(income<10000)return income*0.2;else return income*0.4;}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces",
+      "apiVersion": "2018-01-01-preview",
+      "name": "[parameters('namespaces_tst_name')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard",
+        "capacity": 1
+      },
+      "properties": {
+        "zoneRedundant": false,
+        "isAutoInflateEnabled": false,
+        "maximumThroughputUnits": 0,
+        "kafkaEnabled": true
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2016-10-01",
+      "name": "[parameters('vaults_tst_name')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "sku": {
+          "family": "A",
+          "name": "Standard"
+        },
+        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+        "accessPolicies": [
+          {
+            "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+            "objectId": "e5c7d6c8-baf3-4f65-86b4-50aa8f3a4dfc",
+            "permissions": {
+              "keys": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "secrets": [
+                "Get",
+                "List",
+                "Set",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore"
+              ],
+              "certificates": [
+                "Get",
+                "List",
+                "Update",
+                "Create",
+                "Import",
+                "Delete",
+                "Recover",
+                "Backup",
+                "Restore",
+                "ManageContacts",
+                "ManageIssuers",
+                "GetIssuers",
+                "ListIssuers",
+                "SetIssuers",
+                "DeleteIssuers"
+              ]
+            }
+          }
+        ],
+        "enabledForDeployment": false,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": false,
+        "enableSoftDelete": true
+      }
+    },
+    {
+      "type": "Microsoft.Network/trafficManagerProfiles",
+      "apiVersion": "2018-04-01",
+      "name": "[parameters('trafficManagerProfiles_tst_nst_name')]",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Performance",
+        "dnsConfig": {
+          "relativeName": "[parameters('trafficManagerProfiles_tst_nst_name')]",
+          "ttl": 60
+        },
+        "monitorConfig": {
+          "protocol": "HTTP",
+          "port": 80,
+          "path": "/",
+          "intervalInSeconds": 30,
+          "toleratedNumberOfFailures": 3,
+          "timeoutInSeconds": 10
+        },
+        "endpoints": [
+        ],
+        "trafficViewEnrollmentStatus": "Disabled",
+        "maxReturn": 0
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "name": "[parameters('storageAccounts_tst_name')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Standard_RAGRS",
+        "tier": "Standard"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [
+          ],
+          "ipRules": [
+          ],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+      "apiVersion": "2017-04-01",
+      "name": "[concat(parameters('namespaces_tst_name'), '/RootManageSharedAccessKey')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_tst_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen",
+          "Manage",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/networkRuleSets",
+      "apiVersion": "2018-01-01-preview",
+      "name": "[concat(parameters('namespaces_tst_name'), '/default')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_tst_name'))]"
+      ],
+      "properties": {
+        "defaultAction": "Deny",
+        "virtualNetworkRules": [
+        ],
+        "ipRules": [
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/trafficManagerProfiles",
+      "apiVersion": "2018-04-01",
+      "name": "[parameters('trafficManagerProfiles_tst_rt_name')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_tst_nst_name'))]"
+      ],
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Performance",
+        "dnsConfig": {
+          "relativeName": "[parameters('trafficManagerProfiles_tst_rt_name')]",
+          "ttl": 60
+        },
+        "monitorConfig": {
+          "protocol": "HTTP",
+          "port": 80,
+          "path": "/",
+          "intervalInSeconds": 30,
+          "toleratedNumberOfFailures": 3,
+          "timeoutInSeconds": 10
+        },
+        "endpoints": [
+          {
+            "id": "[concat(resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_tst_rt_name')), '/nestedEndpoints/usw2-ep-01')]",
+            "name": "usw2-ep-01",
+            "type": "Microsoft.Network/trafficManagerProfiles/nestedEndpoints",
+            "properties": {
+              "endpointStatus": "Enabled",
+              "endpointMonitorStatus": "Stopped",
+              "targetResourceId": "[resourceId('Microsoft.Network/trafficManagerProfiles', parameters('trafficManagerProfiles_tst_nst_name'))]",
+              "target": "usw2-ens-arm-tst-atm-nst.trafficmanager.net",
+              "weight": 1,
+              "priority": 1,
+              "endpointLocation": "East Asia",
+              "minChildEndpoints": 1
+            }
+          }
+        ],
+        "trafficViewEnrollmentStatus": "Disabled",
+        "maxReturn": 0
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2019-06-01",
+      "name": "[concat(parameters('storageAccounts_tst_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_RAGRS"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": [
+          ]
+        },
+        "deleteRetentionPolicy": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2019-06-01",
+      "name": "[concat(parameters('storageAccounts_tst_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_RAGRS"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": [
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('vaults_tst_name'), '/', parameters('storageAccounts_tst_name'), 'ConStr')]",
+      "apiVersion": "2016-10-01",
+      "properties": {
+        "contentType": "text/plain",
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_tst_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name')), '2017-10-01').keys[0].value, ';')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_tst_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('vaults_tst_name'), '/', parameters('databaseAccounts_tst_name'), 'ConStr')]",
+      "apiVersion": "2016-10-01",
+      "properties": {
+        "contentType": "text/plain",
+        "value": "[ concat('AccountEndpoint=https://', parameters('databaseAccounts_tst_name'), '.documents.azure.com:443/;AccountKey=', listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('databaseAccounts_tst_name')), '2015-04-08').primaryMasterKey, ';')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_tst_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('vaults_tst_name'), '/', parameters('namespaces_tst_name'), 'ConStr')]",
+      "apiVersion": "2016-10-01",
+      "properties": {
+        "contentType": "text/plain",
+        "value": "[concat('Endpoint=sb://', parameters('namespaces_tst_name'), '.servicebus.windows.net/;SharedAccessKeyName=', listkeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('namespaces_tst_name'), 'RootManageSharedAccessKey'), '2017-04-01').primaryKey)]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
+        "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_tst_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('vaults_tst_name'), '/', parameters('Redis_tst__name'), 'ConStr')]",
+      "apiVersion": "2016-10-01",
+      "properties": {
+        "contentType": "text/plain",
+        "value": "[concat(parameters('Redis_tst__name'), '.redis.cache.windows.net:6380,password=', listKeys(resourceId('Microsoft.Cache/Redis/', parameters('Redis_tst__name')), '2016-04-01').primaryKey, ',ssl=True,abortConnect=False')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_tst_name'))]",
+        "[resourceId('Microsoft.Cache/Redis', parameters('Redis_tst__name'))]"
+      ]
+    }
+  ]
+}

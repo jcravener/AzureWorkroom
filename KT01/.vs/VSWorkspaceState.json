@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\ResourceProvisioning",
+    "\\ResourceProvisioning\\Mustache",
+    "\\ResourceProvisioning\\Mustache\\templates"
+  ],
+  "SelectedNode": "\\ResourceProvisioning\\Mustache\\Mustache.ps1",
+  "PreviewInSolutionExplorer": false
+}
