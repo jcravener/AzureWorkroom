@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "redisCache": {
+            "value": [
+                {
+                    "nameSuffix": "chatsvcagg",
+                    "sku": {
+                        "name": "Premium",
+                        "family": "P",
+                        "capacity": 1
+                    },
+                    "maxclients": "7500",
+                    "maxmemoryReserved": "200",
+                    "maxfragmentationmemoryReserved": "300",
+                    "maxmemoryDelta": "200"
+                },
+                {
+                    "nameSuffix": "load",
+                    "sku": {
+                        "name": "Premium",
+                        "family": "P",
+                        "capacity": 1
+                    },
+                    "maxclients": "7500",
+                    "maxmemoryReserved": "200",
+                    "maxfragmentationmemoryReserved": "300",
+                    "maxmemoryDelta": "200"
+                },
+                {
+                    "nameSuffix": "ratelimiter",
+                    "sku": {
+                        "name": "Standard",
+                        "family": "C",
+                        "capacity": 1
+                    },
+                    "maxclients": "1000",
+                    "maxmemoryReserved": "50",
+                    "maxfragmentationmemoryReserved": "50",
+                    "maxmemoryDelta": "50"
+                }
+            ]
+        }
+    }
+}
