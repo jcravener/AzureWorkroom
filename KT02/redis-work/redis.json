@@ -12,7 +12,7 @@
         "type": "Microsoft.Cache/Redis",
         "apiVersion": "2019-07-01",
         "name": "[concat('redis', '-', copyIndex(), '-', parameters('redisCache')[copyIndex()].nameSuffix)]",
-        "location": "West US 2",
+        "location": "[parameters('redisCache')[copyIndex()].location]",
         "properties": {
           "sku": {
             "name": "[parameters('redisCache')[copyIndex()].sku.name]",
